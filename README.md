@@ -25,3 +25,7 @@ pip install -r requirements.txt
 ```shell
 python webui.py
 ```
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=chinshunyu/video_audio_emotion&type=Date)](https://star-history.com/#chinshunyu/video_audio_emotion&Date)
