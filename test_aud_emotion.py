@@ -17,33 +17,6 @@ pretty_errors.configure(
     line_number_color=pretty_errors.BRIGHT_RED
 )
 
-# from pyAudioAnalysis import audioBasicIO
-# from pyAudioAnalysis import audioFeatureExtraction
-# from pyAudioAnalysis import audioTrainTest as aT
-# pyAudioAnalysis           0.2.5
-# # 载入音频文件
-# audio_file = "003.wav"
-
-# # 提取音频特征
-# # [Fs, x] = audioBasicIO.read_audio_file(audio_file)
-# [Fs, x] = audioBasicIO.readAudioFile(audio_file)
-# print('========================')
-# print(x)
-# print('=============================')
-# # 提取音频特征
-# win_len = 0.050 * Fs  # 设置窗口长度为 50 毫秒
-# step = 0.025 * Fs      # 设置帧移为 25 毫秒
-# features, feature_names = audioFeatureExtraction.stFeatureExtraction(x, Fs, win_len, step)
-
-# # features, feature_names = audioFeatureExtraction.stFeatureExtraction(x, Fs, 0.050*Fs, 0.025*Fs)
-
-# # 加载情绪分类器
-# model_path = "data/svm_rbf_emotion"
-# # 这里使用了 SVM RBF 核的分类器，你也可以选择其他分类器
-# result, P, classNames = aT.fileClassification(audio_file, model_path, "svm_rbf")
-
-# # 输出情绪标签
-# print("Predicted emotion:", classNames[result[0]])
 
 
 from pyAudioAnalysis import audioSegmentation as aS

@@ -55,6 +55,8 @@ class VGG(nn.Module):
 class FaceEmotion():
 
     def __init__(self, video_name):
+        if os.path.exists('./face_detected_emotions.txt'):
+            os.remove('./face_detected_emotions.txt')
         self.video_name = video_name
         self.file_name, _ = os.path.splitext(self.video_name)
         self.cfgs = {
@@ -63,7 +65,8 @@ class FaceEmotion():
             'vgg16': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M'],
             'vgg19': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512, 'M'],
         }
-        self. device = torch.device("cuda:0" if torch.cuda.is_available() else "mps")
+        # self. device = torch.device("cuda:0" if torch.cuda.is_available() else "mps")
+        self. device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         print("use device:", self.device)
         self.data_transform = transforms.Compose(
             [transforms.Resize((224, 224)),
@@ -85,6 +88,28 @@ class FaceEmotion():
         self.model.load_state_dict(torch.load(self.weights_path, map_location=self.device))
         
 
+    def count_video_face_num(self):
+        video_path = self.video_name
+        cap = cv2.VideoCapture(video_path)
+        if not cap.isOpened():
+            print("Cannot open video file")
+            exit()
+        total_face_num = 0
+        while cap.isOpened():
+            ret, img = cap.read()
+            if not ret:
+                return 0
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            faces = face_xml.detectMultiScale(gray, 1.3, 5)
+            face_num = len(faces)
+            total_face_num += face_num
+            if face_num >=2:
+                return 2
+        if total_face_num > 0:
+            return 1
+        else:
+            return 0
+
     def make_features(self, cfg: list):
         layers = []
         in_channels = 3
@@ -105,7 +130,7 @@ class FaceEmotion():
         return model
 
    
-    def get_face_emotion(self):
+    def get_face_emotion(self, detect_emotions):
         video_path = self.video_name
         self.output_video_path = self.file_name + '_with_emotion.mp4'
 
@@ -127,7 +152,8 @@ class FaceEmotion():
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))  # 获取视频总帧数
 
         # 设置输出视频参数
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        # fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        fourcc = cv2.VideoWriter_fourcc('M','P','4','V')
         writer = cv2.VideoWriter(self.output_video_path, fourcc, fps, (frame_width, frame_height))
 
         frame_count = 0  # 记录处理的帧数
@@ -201,7 +227,6 @@ class FaceEmotion():
         # writer.release()
         # cv2.destroyAllWindows()
 
-
         while cap.isOpened():
             # 逐帧读取视频
             ret, img = cap.read()
@@ -215,6 +240,7 @@ class FaceEmotion():
             print('检测到人脸数量：', len(faces))  # 检测当前的人脸个数
 
             # 绘制人脸，为检测到的每个人脸进行画方框绘制
+            emos_this_fp = [] #这一帧的所有情感
             for (x, y, w, h) in faces:
                 cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)  # 人脸识别
                 roi_face = gray[y:y + h, x:x + w]  # 灰色人脸数据
@@ -234,8 +260,19 @@ class FaceEmotion():
                         output = torch.squeeze(self.model(Img.to(self.device))).cpu()
                         predict = torch.softmax(output, dim=0)
                         predict_cla = torch.argmax(predict).numpy()
+                        print(f'predict:{predict}')
 
                     Emotion_class = 'Emotion:{}'.format(self.class_indict[str(predict_cla)])
+                    emos_this_fp.append(self.class_indict[str(predict_cla)])
+                    '''
+                    "0": "angry",
+                    "1": "disgust",
+                    "2": "fear",
+                    "3": "happy",
+                    "4": "neutral",x 
+                    "5": "sad",
+                    "6": "surprise"
+                    '''
                     prob = 'prob:{:.2f}%'.format(predict[predict_cla].numpy()*100)
                     cv2.putText(img, Emotion_class, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
                     cv2.putText(img, prob, (x, y + h + 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
@@ -246,7 +283,13 @@ class FaceEmotion():
                     print('-------检测到目光注视!---------')  # 打印检测出眼睛的个数
                     for (e_x, e_y, e_w, e_h) in eyes:  # 绘制眼睛方框到彩色图片上
                         cv2.rectangle(roi_color, (e_x, e_y), (e_x + e_w, e_y + e_h), (0, 255, 0), 2)
-
+            ## TODO
+            with open('./face_detected_emotions.txt','a') as f:
+                for detect_emotion in detect_emotions:
+                # with open('./face_detected_emotions.txt','a') as f:
+                    if detect_emotion in emos_this_fp: #如果某种情感在这一帧当中，那么，记录第几帧
+                    # with open('./face_detected_emotions.txt','a') as f:
+                        f.write(str({'detect_emotion':detect_emotion,'fpth':frame_count,'fps':fps-1})+'\n')
             # 将帧写入输出视频
             writer.write(img)
 

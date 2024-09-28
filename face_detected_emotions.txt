@@ -1,0 +1,12 @@
+{'detect_emotion': 'sad', 'fpth': 1242, 'fps': 29}
+{'detect_emotion': 'sad', 'fpth': 1243, 'fps': 29}
+{'detect_emotion': 'sad', 'fpth': 1244, 'fps': 29}
+{'detect_emotion': 'sad', 'fpth': 1843, 'fps': 29}
+{'detect_emotion': 'sad', 'fpth': 1845, 'fps': 29}
+{'detect_emotion': 'sad', 'fpth': 1846, 'fps': 29}
+{'detect_emotion': 'sad', 'fpth': 1847, 'fps': 29}
+{'detect_emotion': 'sad', 'fpth': 1853, 'fps': 29}
+{'detect_emotion': 'sad', 'fpth': 1854, 'fps': 29}
+{'detect_emotion': 'sad', 'fpth': 1855, 'fps': 29}
+{'detect_emotion': 'sad', 'fpth': 1856, 'fps': 29}
+{'detect_emotion': 'sad', 'fpth': 1857, 'fps': 29}

@@ -1,8 +1,8 @@
-幸せ
-幸せ
-幸せ
-悲しみ
-怒り
-恐れ
-嫌悪
-驚き
+happy
+happy
+happy
+sad
+angry
+fear
+sad
+surprise
