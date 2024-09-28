@@ -20,6 +20,10 @@ sudo apt-get install imagemagick
 pip install -r requirements.txt
 ```
 
+### 下载模型至 ./sppech_emotion/models
+https://drive.google.com/drive/folders/1EX2BHFQRPuY6yJXqPsNpy7EmcqkG2axZ?usp=drive_link
+
+
 ### 运行:
 
 ```shell
